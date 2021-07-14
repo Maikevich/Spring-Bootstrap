@@ -3,6 +3,7 @@ package jm.SpringBoot.controllers;
 import jm.SpringBoot.dao.UserDao;
 import jm.SpringBoot.model.Role;
 import jm.SpringBoot.model.User;
+import jm.SpringBoot.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
@@ -21,15 +23,17 @@ import java.util.Set;
 public class AdminController {
 
     private final UserDao userService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Autowired
-    public AdminController(UserDao userService) {
+    public AdminController(UserDao userService, UserDetailsServiceImpl userDetailsService) {
         this.userService = userService;
-
+        this.userDetailsService = userDetailsService;
     }
 
     @GetMapping()
-    public String getUsers(Model model) {
+    public String getUsers(Principal principal, Model model) {
+        model.addAttribute("user", userDetailsService.loadUserByUsername(principal.getName()));
         Iterable<User> user = userService.findAll();
         model.addAttribute("users", user);
         return "index";

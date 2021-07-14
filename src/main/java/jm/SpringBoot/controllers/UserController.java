@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.security.Principal;
 
 
 @Controller
@@ -26,15 +27,9 @@ public class UserController {
     }
 
     @GetMapping()
-    public String getCurrentUser(Model model ){
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username;
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails)principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-        model.addAttribute("users", userDetailsService.loadUserByUsername(username));
+    public String getCurrentUser(Principal principal, Model model ){
+
+        model.addAttribute("user", userDetailsService.loadUserByUsername(principal.getName()));
         return "user";
     }
 

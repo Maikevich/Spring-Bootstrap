@@ -58,17 +58,15 @@ public class AdminController {
 
     //
     @PostMapping
-    public String addUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult, @ModelAttribute("role") String my_role) {
-        if (bindingResult.hasErrors()) {
-            return "new";
-        } else {
+    public String addUser(@ModelAttribute("user")  User user, BindingResult bindingResult, @ModelAttribute("rolesList") String my_role) {
+
             Role role = new Role((my_role.equals("ADMIN") ? 1L : 2L), "ROLE" + my_role);
             Set<Role> roles = new HashSet<>();
             roles.add(role);
             user.setRoles(roles);
             userService.save(user);
             return "redirect:/admin";
-        }
+
     }
 
     @GetMapping("/{id}/edit")
@@ -83,12 +81,13 @@ public class AdminController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("user") @Valid User user, BindingResult bindingResult,
-                         @PathVariable("id") long id) {
-        if (bindingResult.hasErrors()) {
-            return "edit";
-        } else {
+    public String update(@ModelAttribute("user") User user,
+                         @PathVariable("id") long id, @ModelAttribute("role") String my_role) {
             if (user.getId() != 0) {
+                Role role = new Role((my_role.equals("ADMIN") ? 1L : 2L), "ROLE" + my_role);
+                Set<Role> roles = new HashSet<>();
+                roles.add(role);
+                user.setRoles(roles);
                 user.setId(id);
                 userService.save(user);
                 return "redirect:/admin";
@@ -97,7 +96,6 @@ public class AdminController {
                 return "redirect:/admin";
             }
         }
-    }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") long id) {
